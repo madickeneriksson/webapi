@@ -1,9 +1,10 @@
 const express = require('express')
 const controller = express.Router()
-
 const productSchema = require('../schemas/productSchema')
 
 // osäkra router
+
+// Hämta lista producter
 controller.route('/').get(async(req, res) => {
     const products = []
     const list = await productSchema.find()
@@ -25,7 +26,7 @@ controller.route('/').get(async(req, res) => {
     res.status(400).json() 
 })
 
-
+// Hämta tag
 controller.route('/:tag').get(async(req, res) => {
     const products = []
     const list = await productSchema.find({ tag: req.params.tag })
@@ -47,6 +48,7 @@ controller.route('/:tag').get(async(req, res) => {
     res.status(400).json() 
 })
 
+// Hämta tag och antal
 controller.route('/:tag/:take').get(async(req, res) => {
     const products = []
     const list = await productSchema.find({ tag: req.params.tag }) .limit(req.params.take)
@@ -68,6 +70,7 @@ controller.route('/:tag/:take').get(async(req, res) => {
    res.status(400).json() 
 })
 
+// Hämta specifik produkt
 controller.route('/product/details/:articleNumber').get(async(req, res) => {
     const product = await productSchema.findById(req.params.articleNumber)
     if(product) {
@@ -85,7 +88,9 @@ controller.route('/product/details/:articleNumber').get(async(req, res) => {
     res.status(404).json() 
 })
 
-// säkra rauter
+// säkra router
+
+// skapa
 controller.route('/').post(async(req, res) => {
     const { tag, name, description, category, price, rating, imageName } = req.body
 
@@ -108,9 +113,11 @@ controller.route('/').post(async(req, res) => {
         if (product)
         res.status(201).json({text: `product ${product._id} is created`})
         else
-        res.status(400).json({text: 'somthing went wrong'})
+        res.status(400).json({text: 'something went wrong'})
     }
 })
+
+// Ta bort
 controller.route('/:articleNumber').delete(async(req, res) => {
     if(!req.params.articleNumber)
     res.status(400).json('enter a article number')
@@ -125,23 +132,21 @@ controller.route('/:articleNumber').delete(async(req, res) => {
     }
 })
 
+// Uppdatera
 controller.route('/:articleNumber').put(async(req, res) => {
     console.log(req.params)
     if(!req.params.articleNumber)
-    res.status(400).json('enter a article number')
+    res.status(400).json('enter a correct article number')
     else {
     const item = await productSchema.findByIdAndUpdate((req.params.articleNumber), req.body, {new: true })
 
         if(item) {
-            res.status(200).json({text: `product ${req.params.articleNumber} was updated`})
+            res.status(200).json({text: `product ${req.params.articleNumber} updated without problems`})
         } else {
             res.status(401).json({text: `product ${req.params.articleNumber} not found`})
         }
         }
     })
     
-    
-
-
 module.exports = controller
 
